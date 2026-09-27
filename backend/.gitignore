@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+**/target/
+
+# Environment / secrets
+.env
+**/.env

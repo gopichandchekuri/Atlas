@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+backend/target/
+
+# Environment / secrets
+.env
+backend/.env
+
+# Local Spring configuration
+backend/src/main/resources/application-local.properties
