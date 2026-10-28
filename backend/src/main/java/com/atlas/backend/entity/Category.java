@@ -5,35 +5,35 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "categories")
-public class Category {
+public class Category{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false,unique = true,length = 100)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition="Text")
     private String description;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false,length = 30)
     private String status;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_At", nullable = false,updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_At",nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
-    void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
+    void onCreate(){
+        createdAt=LocalDateTime.now();
+        updatedAt=createdAt;
     }
 
     @PreUpdate
-    void onUpdate() {
+    void onUpdate(){
         updatedAt = LocalDateTime.now();
     }
 

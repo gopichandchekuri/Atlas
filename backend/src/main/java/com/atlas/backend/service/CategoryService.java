@@ -4,11 +4,12 @@ import com.atlas.backend.entity.Category;
 
 import java.util.List;
 
-public interface CategoryService {
+public interface CategoryService{
 
-    Category createCategory(Category category);
+     Category createCategory(Category category);
+     List<Category> getAllCategories();
+     Category getCategoryById(Long id);
+     void deleteAllCategories();
 
-    List<Category> getAllCategories();
-
-    Category getCategoryById(Long id);
+     void deleteCategoryById(Long id);
 }
