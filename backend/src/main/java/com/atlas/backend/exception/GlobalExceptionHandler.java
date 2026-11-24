@@ -1,6 +1,7 @@
 package com.atlas.backend.exception;
 
 import com.atlas.backend.dto.ErrorResponse;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -61,7 +62,10 @@ public class GlobalExceptionHandler {
                 "Something went wrong. Please try again later.", List.of());
     }
 
-
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessRule(BusinessRuleException exception){
+        return buildErrorResponse(HttpStatus.CONFLICT, exception.getMessage(), List.of());
+    }
 
 
 

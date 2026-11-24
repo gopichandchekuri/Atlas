@@ -17,8 +17,6 @@ public class Warehouse {
     private Long id;
 
 
-
-
     @Column(nullable = false, unique = true, length = 30)
     private String code;
 
