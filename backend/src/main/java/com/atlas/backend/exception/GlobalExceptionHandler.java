@@ -4,6 +4,7 @@ import com.atlas.backend.dto.ErrorResponse;
 import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -67,6 +68,13 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, exception.getMessage(), List.of());
     }
 
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+   public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException exception){
+        log.warn("Data integrity violation", exception);
+        return buildErrorResponse(HttpStatus.CONFLICT, "The request conflicts with existing data",List.of() );
+
+    }
 
 
 

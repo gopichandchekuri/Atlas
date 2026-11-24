@@ -5,6 +5,8 @@ import com.atlas.backend.entity.Product;
 import com.atlas.backend.entity.Warehouse;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -17,6 +19,13 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 
         @EntityGraph(attributePaths = {"product", "warehouse"})
         List<Inventory> findByWarehouseId(Long warehouseId);
+
+
+        @Query("select count(i) from Inventory i "
+                + "where i.warehouse.id = :warehouseId "
+                + "and (i.availableQuantity > 0 or i.reservedQuantity > 0)")
+        long countStockedLinesByWarehouseId(@Param("warehouseId") Long warehouseId);
+
 
 
 

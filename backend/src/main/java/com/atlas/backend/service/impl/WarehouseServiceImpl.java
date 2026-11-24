@@ -4,8 +4,10 @@ import com.atlas.backend.dto.WarehouseRequest;
 import com.atlas.backend.dto.WarehouseResponse;
 import com.atlas.backend.dto.WarehouseStatusRequest;
 import com.atlas.backend.entity.Warehouse;
+import com.atlas.backend.exception.BusinessRuleException;
 import com.atlas.backend.exception.DuplicateResourceException;
 import com.atlas.backend.exception.ResourceNotFoundException;
+import com.atlas.backend.repository.InventoryRepository;
 import com.atlas.backend.repository.WarehouseRepository;
 import com.atlas.backend.service.WarehouseService;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
 
     private final WarehouseRepository warehouseRepository;
+    private final InventoryRepository inventoryRepository;
 
-    public WarehouseServiceImpl(WarehouseRepository warehouseRepository){
+
+    public WarehouseServiceImpl(WarehouseRepository warehouseRepository,InventoryRepository inventoryRepository){
         this.warehouseRepository=warehouseRepository;
+        this.inventoryRepository= inventoryRepository;
     }
 
     @Override
@@ -60,6 +65,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional
     public WarehouseResponse updateWarehouse(Long warehouseId, WarehouseRequest request) {
         Warehouse warehouse=findWarehouseOrThrow(warehouseId);
         String normalizedCode=normalizeCode(request.code());
@@ -69,20 +75,29 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         copyRequestToWarehouse(request,warehouse);
         warehouse.setCode(normalizedCode);
-        return toResponse(warehouse);
+        Warehouse savedWarehouse = warehouseRepository.saveAndFlush(warehouse);
+        return toResponse(savedWarehouse);
 
     }
 
     @Override
+    @Transactional
     public WarehouseResponse updateWarehouseStatus(Long warehouseId, WarehouseStatusRequest request) {
         Warehouse warehouse= findWarehouseOrThrow(warehouseId);
+
+        if("INACTIVE".equals(request.status())){
+            ensureWarehouseHasNoStock(warehouse);
+        }
+
         warehouse.setStatus(request.status());
-        return toResponse(warehouse);
+        Warehouse savedWarehouse = warehouseRepository.saveAndFlush(warehouse);
+        return toResponse(savedWarehouse);
     }
 
     @Override
     public void deleteWarehouseById(Long warehouseId) {
         Warehouse warehouse= findWarehouseOrThrow(warehouseId);
+        ensureWarehouseHasNoStock(warehouse);
         warehouse.setStatus("INACTIVE");
 
     }
@@ -101,6 +116,16 @@ public class WarehouseServiceImpl implements WarehouseService {
         warehouse.setCode(request.code());
         warehouse.setName(request.name().trim());
         warehouse.setLocation(request.location().trim());
+
+    }
+
+    private void ensureWarehouseHasNoStock(Warehouse warehouse){
+
+        long stockedLines=inventoryRepository.countStockedLinesByWarehouseId(warehouse.getId());
+        if(stockedLines>0){
+            throw new BusinessRuleException("Cannot close warehouse " + warehouse.getCode()
+                    + ": it still holds stock in " + stockedLines + " product line(s)");
+        }
 
     }
 

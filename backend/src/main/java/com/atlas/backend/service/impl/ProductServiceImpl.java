@@ -67,8 +67,9 @@ public class ProductServiceImpl implements ProductService {
       if(productRepository.existsBySkuAndIdNot(request.sku(),productId )){
           throw new DuplicateResourceException("SKU already exists:" + request.sku());
       }
-      copyRequestToProduct(product,request);
-      return toResponse(product);
+        copyRequestToProduct(product, request);
+        Product savedProduct = productRepository.saveAndFlush(product);
+        return toResponse(savedProduct);
 
     }
 
@@ -77,7 +78,8 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateStatus(Long productId, ProductStatusRequest request){
         Product product=findProductOrThrow(productId);
         product.setStatus(request.status());
-        return toResponse(product);
+        Product savedProduct = productRepository.saveAndFlush(product);
+        return toResponse(savedProduct);
 
     }
 

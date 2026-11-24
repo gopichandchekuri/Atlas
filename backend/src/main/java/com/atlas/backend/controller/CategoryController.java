@@ -1,13 +1,28 @@
 package com.atlas.backend.controller;
 
-import com.atlas.backend.entity.Category;
+import com.atlas.backend.dto.CategoryRequest;
+import com.atlas.backend.dto.CategoryResponse;
+import com.atlas.backend.dto.CategoryStatusRequest;
 import com.atlas.backend.service.CategoryService;
-import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories")
-public class CategoryController{
+@RequestMapping("/api/v1/categories")
+public class CategoryController {
+
     private final CategoryService categoryService;
 
     public CategoryController(CategoryService categoryService) {
@@ -15,31 +30,36 @@ public class CategoryController{
     }
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category){
-        return categoryService.createCategory(category);
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryResponse createCategory(@Valid @RequestBody CategoryRequest request) {
+        return categoryService.createCategory(request);
     }
 
     @GetMapping
-    public List<Category> getAllCategories(){
+    public List<CategoryResponse> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
-    @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id){
-        return categoryService.getCategoryById(id);
+    @GetMapping("/{categoryId}")
+    public CategoryResponse getCategoryById(@PathVariable Long categoryId) {
+        return categoryService.getCategoryById(categoryId);
     }
 
-    @DeleteMapping
-    public void deleteAllCategories(){
-        categoryService.deleteAllCategories();
+    @PutMapping("/{categoryId}")
+    public CategoryResponse updateCategory(@PathVariable Long categoryId,
+                                           @Valid @RequestBody CategoryRequest request) {
+        return categoryService.updateCategory(categoryId, request);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteCategoryById(@PathVariable Long id){
-        categoryService.deleteCategoryById(id);
+    @PatchMapping("/{categoryId}/status")
+    public CategoryResponse updateCategoryStatus(@PathVariable Long categoryId,
+                                                 @Valid @RequestBody CategoryStatusRequest request) {
+        return categoryService.updateCategoryStatus(categoryId, request);
     }
 
-
-
-
+    @DeleteMapping("/{categoryId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCategoryById(@PathVariable Long categoryId) {
+        categoryService.deleteCategoryById(categoryId);
+    }
 }
